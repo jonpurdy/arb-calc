@@ -30,7 +30,7 @@ def get_all_spreads():
     DB_USERNAME = config.get('main', 'DB_USERNAME')
     DB_PASSWORD = config.get('main', 'DB_PASSWORD')
 
-    crypto_list = ['btc', 'eth', 'xrp']
+    crypto_list = ['btc', 'eth', 'xrp', 'etc']
 
 
     a = {'name': 'korbit'}

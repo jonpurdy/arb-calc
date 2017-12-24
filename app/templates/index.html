@@ -1,11 +1,18 @@
 <html>
-  <head>
-    <title>{{ title }}</title>
-  </head>
-  <body>
-      <h1>{{ user.nickname }}</h1>
-      {% for spread in spreads %}
-    	{{ spread }}
-    	{% endfor %}
-  </body>
+    <head>
+        <title>whatevs</title>
+    </head>
+    <body>
+        <h1>{{ user.nickname }}</h1>
+        <table border=1>     
+        {% for row in table_data %}
+            <tr>
+            {% for cell in row %}
+                <td>{{ cell }}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+        {{ all_spreads }}
+    </body>
 </html>

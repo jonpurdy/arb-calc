@@ -21,6 +21,10 @@ def main():
     get_spread(a, b)
 
 def get_spread(a, b, curr):
+    ''' First, get the price of curr on exchange a.
+        Second, get the price of curr on exchange b.
+        Finally, calculate and return the spread.
+    '''
 
     # Set configuration and logging up first
     config_location = "~/.arb-calc"
@@ -30,13 +34,6 @@ def get_spread(a, b, curr):
     DB_USERNAME = config.get('main', 'DB_USERNAME')
     DB_PASSWORD = config.get('main', 'DB_PASSWORD')
 
-    #crypto_list = ['btc', 'eth', 'xrp', 'etc']
-    crypto_list = [curr]
-
-    # a = {'name': 'korbit'}
-    # b = {'name': 'kraken'}
-    e_list = [a, b] # used to iterate through db queries
-
     try:
         db = pymysql.connect(DB_IP, DB_USERNAME, DB_PASSWORD, cursorclass=pymysql.cursors.DictCursor)
     except Exception as e:
@@ -45,45 +42,45 @@ def get_spread(a, b, curr):
         exit()
 
 
-    for e in e_list:
-        #print("exchange: %s" % e['name'])
+    query = """
+    SELECT id, created, exchange, price_usd 
+    FROM crypto_historical.%s
+    WHERE exchange = '%s'
+    ORDER BY created DESC
+    LIMIT 1
+    """ % (curr, a)
+    cursor = db.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
 
-        for c in crypto_list:
-            #print("crypto: %s" % c)
-            
-            query = """
-            SELECT id, created, exchange, price_usd 
-            FROM crypto_historical.%s
-            WHERE exchange = '%s'
-            ORDER BY created DESC
-            LIMIT 1
-            """ % (c, e['name'])
+    # sets the price of the cryptocurrency for the particular exchange
+    # scroll up to see loop-defined variables e and c
+    a_price = result[0]['price_usd']
 
-            cursor = db.cursor()
-            cursor.execute(query)
-            result = cursor.fetchall()
+    query = """
+    SELECT id, created, exchange, price_usd 
+    FROM crypto_historical.%s
+    WHERE exchange = '%s'
+    ORDER BY created DESC
+    LIMIT 1
+    """ % (curr, b)
+    cursor = db.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
 
-            # sets the price of the cryptocurrency for the particular exchange
-            # scroll up to see loop-defined variables e and c
-            e[c] = result[0]['price_usd']
-
-            # .strftime('%Y-%m-%d %H:%M:%S')
-
-        #print("-----")
+    # sets the price of the cryptocurrency for the particular exchange
+    # scroll up to see loop-defined variables e and c
+    b_price = result[0]['price_usd']
 
     db.close()
 
     # korbit_prices_usd_dict = {'name': 'korbit', 'btc': float(15000), 'eth': float(440), 'xrp': float(0.24)}
     # kraken_prices_usd_dict = {'name': 'kraken', 'btc': float(14000), 'eth': float(430), 'xrp': float(0.26)}
 
-    spreads = []
-    title = "%s vs %s" % (a["name"], b["name"])
     # Calculate percentage difference for each pair
-    for curr in crypto_list:
-        spread = calculate_price_spread(curr, a[curr], b[curr])
-        spreads.append([curr, "%s%%" % spread])
-        #spread_string += "%s\n" % spread
-    return spreads, title
+    spread = calculate_price_spread(curr, a_price, b_price)
+
+    return spread, a_price, b_price, a + " vs " + b
 
 
 def calculate_price_spread(curr, a, b):

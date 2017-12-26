@@ -4,15 +4,20 @@
     </head>
     <body>
         <h1>{{ user.nickname }}</h1>
-        <table border=1>     
-        {% for row in table_data %}
-            <tr>
-            {% for cell in row %}
-                <td>{{ cell }}</td>
+        {% for currency in all_spreads %}
+            <p><table border=1>     
+            <tr><td>{{ currency[0] }}</td><td>Price 1</td><td>Price 2</td><td>Spread %</td></tr>
+            {% for row in currency[1] %}
+                <tr>
+                {% for cell in row %}
+                    <td>{{ cell }}</td>
+                {% endfor %}
+                </tr>
             {% endfor %}
-            </tr>
+            </table></p>
+
         {% endfor %}
-        </table>
-        {{ all_spreads }}
+
+        <p>Raw data for debugging: {{ all_spreads }}</p>
     </body>
 </html>

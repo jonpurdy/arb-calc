@@ -14,36 +14,61 @@ import itertools
 
 def index():
 
-    list_of_exchanges = ['korbit', 'kraken']
+    list_of_exchanges = ['korbit', 'kraken', 'quadriga', 'bitso']
 
-    # product('ABCD', repeat=2)
-    # result =  AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD
-    # this is what I need to generate the table that I want
-    combos = itertools.product(list_of_exchanges, repeat=2)
+
+    combos = itertools.combinations(list_of_exchanges, 2)
     combos_list = list(combos)
 
+    # # product('ABCD', repeat=2)
+    # # result =  AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD
+    # # this is what I need to generate the table that I want
+    # combos = itertools.product(list_of_exchanges, repeat=2)
+    # combos_list = list(combos)
+
+    #crypto_list = ['btc', 'eth', 'xrp', 'etc']
     crypto_list = ['btc', 'eth', 'xrp', 'etc']
 
     all_spreads = []
 
+    # for each currency
     for curr in crypto_list:
         table_data2 = []
         print("-----\ncurrency: %s" % curr)
+        
+
+        # now, let's generate a table for one currency
+        row = []
         for pair in combos_list:
+
             print("----\npair:")
             print(pair)
-            a = {'name': pair[0]}
-            b = {'name': pair[1]}
-            this_spread = get_spread(a, b, curr)
-            print(this_spread)
-            table_data2.append(this_spread)
+            a = pair[0]
+            b = pair[1]
+            try:
+                this_spread, a_price, b_price, title = get_spread(a, b, curr)
+                table_data2.append([title, a_price, b_price, this_spread])
+                print("%s %s" % (title, this_spread))
+            except:
+                print("Couldn't get spread.")
+    
+            
+            
+            # # just append the spread to the row
+            # if len(row) < len(list_of_exchanges):
+            #     row.append(this_spread)
 
-        # a = {'name': 'korbit'}
-        # b = {'name': 'kraken'}
+            # # time for a new row; append the old row to the table
+            # # then create a new one, and append the spread to the new row
+            # elif len(row) == len(list_of_exchanges):
+            #     print("len(row): %s, len(list_of_exchanges): %s" % (len(row), len(list_of_exchanges)))
+            #     table_data2.append(row)
+            #     row = []
+            #     row.append(this_spread)
 
-        print(table_data2)
-        # for item in table_data2:
-        #     print("here: %s" % item)
+        # # this appends the final unappended row
+        # table_data2.append(row)
+        print("table_data2:\n%s" % table_data2)
 
         # example table data
         table_data = [
@@ -52,8 +77,10 @@ def index():
             ["kraken", "-30%", "0"]
         ]
 
+        all_spreads.append((curr, table_data2))
+
     user = {'nickname': ' '}  # fake user
     return render_template('index.html',
                            user=user,
-                           table_data=table_data,
+                           table_data=table_data2,
                            all_spreads=all_spreads)

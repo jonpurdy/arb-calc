@@ -1,11 +1,23 @@
 <html>
-  <head>
-    <title>{{ title }}</title>
-  </head>
-  <body>
-      <h1>{{ user.nickname }}</h1>
-      {% for spread in spreads %}
-    	{{ spread }}
-    	{% endfor %}
-  </body>
+    <head>
+        <title>whatevs</title>
+    </head>
+    <body>
+        <h1>{{ user.nickname }}</h1>
+        {% for currency in all_spreads %}
+            <p><table border=1>     
+            <tr><td>{{ currency[0] }}</td><td>Price 1</td><td>Price 2</td><td>Spread %</td></tr>
+            {% for row in currency[1] %}
+                <tr>
+                {% for cell in row %}
+                    <td>{{ cell }}</td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+            </table></p>
+
+        {% endfor %}
+
+        <p>Raw data for debugging: {{ all_spreads }}</p>
+    </body>
 </html>

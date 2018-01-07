@@ -1,23 +1,65 @@
-<html>
+<!doctype html>
+<html lang="en">
     <head>
+        <!-- Required meta tags for Bootstrap-->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Bootstrap-->
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0-beta.2/cyborg/bootstrap.min.css">
         <title>whatevs</title>
     </head>
     <body>
-        <h1>{{ user.nickname }}</h1>
-        {% for currency in all_spreads %}
-            <p><table border=1>     
-            <tr><td>{{ currency[0] }}</td><td>Price 1</td><td>Price 2</td><td>Spread %</td></tr>
-            {% for row in currency[1] %}
-                <tr>
-                {% for cell in row %}
-                    <td>{{ cell }}</td>
+
+        <!-- Bootstrap-->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+
+        <!-- Starts Bootstrap container -->
+        <div class="container">
+
+            <h1>{{ user.nickname }}</h1>
+            <!-- Each currency gets its own table -->
+            {% for currency in all_spreads %}
+                <p><table class="table table-bordered table-sm">  
+
+                <!-- First, format the header -->
+                <thead><tr><th>{{ currency[0] }}</th><th>Price 1</th><th>Price 2</th><th>Spread %</th></tr></thead>
+
+                <!-- Next, print each exchange pair -->
+                {% for row in currency[1] %}
+                    <tbody><tr>
+
+                    {% for cell in row %}
+                    <!-- row contains title, a_price, b_price, this_spread -->
+                        {% if row[3] | int >= 40 %} 
+                            <td class="table-danger">{{ cell }}</td>
+                        {% elif row[3] | int >= 30 %}
+                            <td class="table-warning">{{ cell }}</td>
+                        {% else %}
+                            <td>{{ cell }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    </tr></tbody>
                 {% endfor %}
-                </tr>
+
+                </table></p>
+
+            <!-- Starts Bootstrap container
+            <td class="table-active">...</td>
+            <td class="table-success">...</td>
+            <td class="table-warning">...</td>
+            <td class="table-danger">...</td>
+            <td class="table-info">...</td>-->
+
             {% endfor %}
-            </table></p>
 
-        {% endfor %}
+            <p>Raw data for debugging: {{ all_spreads }}</p>
 
-        <p>Raw data for debugging: {{ all_spreads }}</p>
+        <!-- Ends Bootstrap container -->
+        </div>
+
     </body>
 </html>

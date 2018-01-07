@@ -22,7 +22,7 @@
             <h1>{{ user.nickname }}</h1>
             <!-- Each currency gets its own table -->
             {% for currency in all_spreads %}
-                <p><table class="table table-bordered table-sm">  
+                <p><table class="table table-bordered ">  
 
                 <!-- First, format the header -->
                 <thead><tr><th>{{ currency[0] }}</th><th>Price 1</th><th>Price 2</th><th>Spread %</th></tr></thead>
@@ -33,12 +33,30 @@
 
                     {% for cell in row %}
                     <!-- row contains title, a_price, b_price, this_spread -->
-                        {% if row[3] | int >= 40 %} 
-                            <td class="table-danger">{{ cell }}</td>
+                        {% if row[3] | int >= 50 %} 
+                            <td bgcolor="B20000">{{ cell }}</td>
+                        {% elif row[3] | int >= 45 %}
+                            <td bgcolor="CC0000">{{ cell }}</td>
+                        {% elif row[3] | int >= 40 %}
+                            <td bgcolor="E50000">{{ cell }}</td>
+                        {% elif row[3] | int >= 35 %}
+                            <td bgcolor="FF0000">{{ cell }}</td>
                         {% elif row[3] | int >= 30 %}
-                            <td class="table-warning">{{ cell }}</td>
+                            <td bgcolor="E50166">{{ cell }}</td>
+                        {% elif row[3] | int >= 25 %}
+                            <td bgcolor="D80190">{{ cell }}</td>
+                        {% elif row[3] | int >= 20 %}
+                            <td bgcolor="CB01B5">{{ cell }}</td>
+                        {% elif row[3] | int >= 15 %}
+                            <td bgcolor="AA02BF">{{ cell }}</td>
+                        {% elif row[3] | int >= 10 %}
+                            <td bgcolor="7702B2">{{ cell }}</td>
+                        {% elif row[3] | int >= 5 %}
+                            <td bgcolor="4B02A5">{{ cell }}</td>
+                        {% elif row[3] | int >= 0 %}
+                            <td bgcolor="240298">{{ cell }}</td>
                         {% else %}
-                            <td>{{ cell }}</td>
+                            <td bgcolor="03038C">{{ cell }}</td>
                         {% endif %}
                     {% endfor %}
 
@@ -46,6 +64,9 @@
                 {% endfor %}
 
                 </table></p>
+  
+
+
 
             <!-- Starts Bootstrap container
             <td class="table-active">...</td>
@@ -56,7 +77,17 @@
 
             {% endfor %}
 
-            <p>Raw data for debugging: {{ all_spreads }}</p>
+            <p>
+              <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Raw data for debugging
+              </a>
+            </p>
+            <div class="collapse" id="collapseExample">
+              <div class="card card-body">
+                {{ all_spreads }}
+              </div>
+            </div>
+
 
         <!-- Ends Bootstrap container -->
         </div>

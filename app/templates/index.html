@@ -121,25 +121,29 @@
                 console.log( exchange_pairs );
 
                 // Next, loop through each exchange and get the price
-                $.each(currencies , function (index, curr){
-                    console.log( curr );
-                    $.each(exchanges , function (index, exchange){
-                        console.log( exchange );
-                        $.ajax({
-                             url : 'get_curr_price_from_exchange',
-                             data: {
-                                currency: curr,
-                                exchange: exchange
-                             },
-                             type: "GET",
-                             dataType : "text",
-                        })
-                        .done(function( text ) {
-                             $( 'div.' + curr + exchange ).html( text );
-                             // id vs class: $( '#' + value ).html( text );
+                function getPrices() {
+                    $.each(currencies , function (index, curr){
+                        console.log( curr );
+                        $.each(exchanges , function (index, exchange){
+                            console.log( exchange );
+                            $.ajax({
+                                 url : 'get_curr_price_from_exchange',
+                                 data: {
+                                    currency: curr,
+                                    exchange: exchange
+                                 },
+                                 type: "GET",
+                                 dataType : "text",
+                            })
+                            .done(function( text ) {
+                                 $( 'div.' + curr + exchange ).html( text );
+                                 // id vs class: $( '#' + value ).html( text );
+                                 // setTimeout(getPrices, 10);
+                            })
                         })
                     })
-                })
+                };
+                getPrices();
 
                 // Finally, loop through each exchange pair and get the spread
                 $.each(exchange_pairs , function (index, exch_pair){
@@ -180,7 +184,7 @@
                             $( 'tr.' + exch_pair ).css("background-color", "#03038C"); 
                         } 
                          // id vs class: $( '#' + value ).html( text );
-                        
+                        setTimeout(ajax, 20);
                     })
                 })
 

@@ -9,13 +9,17 @@ from app.mod_arbcalc.arbcalc import get_spread as get_spread
 from app import app
 import itertools
 
+
+
 @app.route('/')
 @app.route('/index')
 
 def index():
 
+    global list_of_exchanges
+    global list_of_currencies
+    list_of_currencies = ['btc', 'eth', 'xrp']
     list_of_exchanges = ['korbit', 'kraken', 'quadriga', 'bitso']
-
 
     combos = itertools.combinations(list_of_exchanges, 2)
     combos_list = list(combos)
@@ -59,19 +63,15 @@ def index():
 
 @app.route('/get_currencies')
 def get_currencies():
-    list_of_currencies = ['btc', 'eth', 'xrp']
     return jsonify(list_of_currencies)
 
 @app.route('/get_exchanges')
 def get_exchanges():
-    list_of_exchanges = ['korbit', 'kraken', 'quadriga', 'bitso']
     return jsonify(list_of_exchanges)
 
 
 @app.route('/get_exchange_pairs')
 def get_exchange_pairs():
-    list_of_currencies = ['btc', 'eth', 'xrp']
-    list_of_exchanges = ['korbit', 'kraken', 'quadriga', 'bitso']
     combos = itertools.combinations(list_of_exchanges, 2)
     combos_list = list(combos)
 

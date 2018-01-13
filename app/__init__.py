@@ -27,7 +27,7 @@ def index():
     # combos_list = list(combos)
 
     #crypto_list = ['btc', 'eth', 'xrp', 'etc']
-    crypto_list = ['btc', 'eth']
+    crypto_list = ['btc', 'eth', 'xrp']
 
     all_pairs = []
 
@@ -44,22 +44,42 @@ def index():
             print(pair)
             a = pair[0]
             b = pair[1]
-            try:
-                title = a + " / " + b
-                table_data2.append([title, a, b])
-            except:
-                print("Couldn't get spread.")
+
+            title = a + " / " + b
+            table_data2.append([title, a, b])
         
 
         all_pairs.append((curr, table_data2))
 
-    user = {'nickname': ' '}  # fake user
     return render_template('index.html',
-                           user=user,
                            table_data=table_data2,
                            all_pairs=all_pairs,
-                           list_of_exchanges=jsonify(list_of_exchanges))
+                           list_of_exchanges=jsonify(list_of_exchanges),
+                           combos_list=combos_list)
 
+@app.route('/get_currencies')
+def get_currencies():
+    list_of_currencies = ['btc', 'eth', 'xrp']
+    return jsonify(list_of_currencies)
+
+@app.route('/get_exchanges')
+def get_exchanges():
+    list_of_exchanges = ['korbit', 'kraken', 'quadriga', 'bitso']
+    return jsonify(list_of_exchanges)
+
+
+@app.route('/get_exchange_pairs')
+def get_exchange_pairs():
+    list_of_currencies = ['btc', 'eth', 'xrp']
+    list_of_exchanges = ['korbit', 'kraken', 'quadriga', 'bitso']
+    combos = itertools.combinations(list_of_exchanges, 2)
+    combos_list = list(combos)
+
+    currency_and_exchange_pairs = []
+    for curr in list_of_currencies:
+        for pair in combos_list:
+            currency_and_exchange_pairs.append(curr + "-" + pair[0] +  "-" + pair[1])
+    return jsonify(currency_and_exchange_pairs)
 
 @app.route('/get_curr_price_from_exchange')
 def get_curr_price_from_exchange():
@@ -67,4 +87,26 @@ def get_curr_price_from_exchange():
     exchange = request.args.get('exchange', "", type=str)
 
     price = get_price(currency, exchange)
+    return jsonify(price)
+
+@app.route('/get_spread_now')
+def get_spread_now():
+    # currency = request.args.get('currency', "", type=str)
+    # exchange1 = request.args.get('exchange1', "", type=str)
+    # exchange2 = request.args.get('exchange2', "", type=str)
+    it = request.args.get('exch_pair', "", type=str)
+    currency, exchange1, exchange2 = it.split("-")
+    print(exchange1, exchange2, currency)
+
+    spread, a_price, b_price = get_spread(exchange1, exchange2, currency)
+    return spread
+
+@app.route('/get_spread_historical')
+def get_spread_historical():
+    currency = request.args.get('currency', "", type=str)
+    exchange1 = request.args.get('exchange1', "", type=str)
+    exchange2 = request.args.get('exchange2', "", type=str)
+    when = request.args.get('date', "", type=str)
+
+    spread = get_price(currency, exchange)
     return jsonify(price)

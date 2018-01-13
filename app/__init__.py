@@ -1,11 +1,11 @@
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 #from app import views
 
+from app.mod_arbcalc.arbcalc import get_price as get_price
 from app.mod_arbcalc.arbcalc import get_spread as get_spread
 
-from flask import render_template
 from app import app
 import itertools
 
@@ -27,15 +27,14 @@ def index():
     # combos_list = list(combos)
 
     #crypto_list = ['btc', 'eth', 'xrp', 'etc']
-    crypto_list = ['btc', 'eth', 'xrp', 'etc']
+    crypto_list = ['btc', 'eth']
 
-    all_spreads = []
+    all_pairs = []
 
     # for each currency
     for curr in crypto_list:
         table_data2 = []
         print("-----\ncurrency: %s" % curr)
-        
 
         # now, let's generate a table for one currency
         row = []
@@ -46,41 +45,26 @@ def index():
             a = pair[0]
             b = pair[1]
             try:
-                this_spread, a_price, b_price, title = get_spread(a, b, curr)
-                table_data2.append([title, a_price, b_price, this_spread])
-                print("%s %s" % (title, this_spread))
+                title = a + " / " + b
+                table_data2.append([title, a, b])
             except:
                 print("Couldn't get spread.")
-    
-            
-            
-            # # just append the spread to the row
-            # if len(row) < len(list_of_exchanges):
-            #     row.append(this_spread)
+        
 
-            # # time for a new row; append the old row to the table
-            # # then create a new one, and append the spread to the new row
-            # elif len(row) == len(list_of_exchanges):
-            #     print("len(row): %s, len(list_of_exchanges): %s" % (len(row), len(list_of_exchanges)))
-            #     table_data2.append(row)
-            #     row = []
-            #     row.append(this_spread)
-
-        # # this appends the final unappended row
-        # table_data2.append(row)
-        print("table_data2:\n%s" % table_data2)
-
-        # example table data
-        table_data = [
-            ["", "korbit", "kraken"],
-            ["korbit", "0", "30%"],
-            ["kraken", "-30%", "0"]
-        ]
-
-        all_spreads.append((curr, table_data2))
+        all_pairs.append((curr, table_data2))
 
     user = {'nickname': ' '}  # fake user
     return render_template('index.html',
                            user=user,
                            table_data=table_data2,
-                           all_spreads=all_spreads)
+                           all_pairs=all_pairs,
+                           list_of_exchanges=jsonify(list_of_exchanges))
+
+
+@app.route('/get_curr_price_from_exchange')
+def get_curr_price_from_exchange():
+    currency = request.args.get('currency', "", type=str)
+    exchange = request.args.get('exchange', "", type=str)
+
+    price = get_price(currency, exchange)
+    return jsonify(price)

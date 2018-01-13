@@ -19,9 +19,8 @@
         <!-- Starts Bootstrap container -->
         <div class="container">
 
-            <h1>{{ user.nickname }}</h1>
             <!-- Each currency gets its own table -->
-            {% for currency in all_spreads %}
+            {% for currency in all_pairs %}
                 <p><table class="table table-bordered ">  
 
                 <!-- First, format the header -->
@@ -31,34 +30,12 @@
                 {% for row in currency[1] %}
                     <tbody><tr>
 
-                    {% for cell in row %}
-                    <!-- row contains title, a_price, b_price, this_spread -->
-                        {% if row[3] | int >= 50 %} 
-                            <td bgcolor="B20000">{{ cell }}</td>
-                        {% elif row[3] | int >= 45 %}
-                            <td bgcolor="CC0000">{{ cell }}</td>
-                        {% elif row[3] | int >= 40 %}
-                            <td bgcolor="E50000">{{ cell }}</td>
-                        {% elif row[3] | int >= 35 %}
-                            <td bgcolor="FF0000">{{ cell }}</td>
-                        {% elif row[3] | int >= 30 %}
-                            <td bgcolor="E50166">{{ cell }}</td>
-                        {% elif row[3] | int >= 25 %}
-                            <td bgcolor="D80190">{{ cell }}</td>
-                        {% elif row[3] | int >= 20 %}
-                            <td bgcolor="CB01B5">{{ cell }}</td>
-                        {% elif row[3] | int >= 15 %}
-                            <td bgcolor="AA02BF">{{ cell }}</td>
-                        {% elif row[3] | int >= 10 %}
-                            <td bgcolor="7702B2">{{ cell }}</td>
-                        {% elif row[3] | int >= 5 %}
-                            <td bgcolor="4B02A5">{{ cell }}</td>
-                        {% elif row[3] | int >= 0 %}
-                            <td bgcolor="240298">{{ cell }}</td>
-                        {% else %}
-                            <td bgcolor="03038C">{{ cell }}</td>
-                        {% endif %}
-                    {% endfor %}
+                    <td>{{ row[0] }}</td>
+
+                    <td><div id="{{ row[1] }}"></div></td>
+                    <td><div id="{{ row[2] }}"></div></td>
+                    <!-- div id for spread example: 'korbitquadriga' -->
+                    <td><div id="{{ row[1] }}{{ row[2] }}"></div>{{ row[1] }}{{ row[2] }}</td>
 
                     </tr></tbody>
                 {% endfor %}
@@ -66,14 +43,6 @@
                 </table></p>
   
 
-
-
-            <!-- Starts Bootstrap container
-            <td class="table-active">...</td>
-            <td class="table-success">...</td>
-            <td class="table-warning">...</td>
-            <td class="table-danger">...</td>
-            <td class="table-info">...</td>-->
 
             {% endfor %}
 
@@ -84,7 +53,7 @@
             </p>
             <div class="collapse" id="collapseExample">
               <div class="card card-body">
-                {{ all_spreads }}
+                {{ all_pairs }}
               </div>
             </div>
 
@@ -92,5 +61,42 @@
         <!-- Ends Bootstrap container -->
         </div>
 
+
+
+        <script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+        <script type="text/javascript">
+            var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        </script>
+
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>
+            $( document ).ready(function(){
+
+                console.log( "ready!" );
+
+                $.ajax({
+                     url : 'get_curr_price_from_exchange',
+                     data: {
+                        currency: "eth",
+                        exchange: "quadriga"
+                     },
+                     type: "GET",
+                     dataType : "text",
+                })
+                .done(function( text ) {
+                     $( "#quadriga" ).html( text );
+                  })
+
+                // $.ajax( {
+                //     url : 'get_curr_price_from_exchange', // your ajax file
+                //     type : 'post',
+                //     data : postData,                
+                //     success : function( resp ) {
+                //         $('#korbit').html($('#korbit' , resp).html());
+                //         $('#quadriga').html($('#quadriga' , resp).html());
+                //     }
+                });
+         </script>
     </body>
 </html>

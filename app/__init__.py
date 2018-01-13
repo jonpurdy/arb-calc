@@ -18,7 +18,7 @@ def index():
 
     global list_of_exchanges
     global list_of_currencies
-    list_of_currencies = ['btc', 'eth', 'xrp']
+    list_of_currencies = ['btc', 'eth']
     list_of_exchanges = ['korbit', 'kraken', 'quadriga', 'bitso']
 
     combos = itertools.combinations(list_of_exchanges, 2)

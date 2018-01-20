@@ -140,12 +140,13 @@
                             .done(function( text ) {
                                  $( 'div.' + curr + exchange ).html( text );
                                  // id vs class: $( '#' + value ).html( text );
-                                 // setTimeout(getPrices, 10);
+                                 // setTimeout(getPrices, 60);
                             })
                         })
                     })
                 };
                 getPrices();
+                // setTimeout(getPrices, 10);
 
                 // Finally, loop through each exchange pair and get the spread
                 $.each(exchange_pairs , function (index, exch_pair){

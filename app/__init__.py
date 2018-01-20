@@ -18,11 +18,12 @@ def index():
 
     global list_of_exchanges
     global list_of_currencies
+    
     list_of_currencies = ['btc', 'eth']
-    list_of_exchanges = ['korbit', 'kraken', 'quadriga', 'bitso']
+    list_of_exchanges = ['korbit', 'gemini', 'kraken', 'quadriga', 'bitso']
 
-    combos = itertools.combinations(list_of_exchanges, 2)
-    combos_list = list(combos)
+    # combos = itertools.combinations(list_of_exchanges, 2)
+    # combos_list = list(combos)
 
     # # product('ABCD', repeat=2)
     # # result =  AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD
@@ -30,8 +31,16 @@ def index():
     # combos = itertools.product(list_of_exchanges, repeat=2)
     # combos_list = list(combos)
 
+
+    combos_list = [
+                    ('korbit', 'gemini'),
+                    ('korbit', 'kraken'),
+                    ('korbit', 'quadriga'),
+                    ('korbit', 'bitso')
+                    ]
+
     #crypto_list = ['btc', 'eth', 'xrp', 'etc']
-    crypto_list = ['btc', 'eth', 'xrp']
+    crypto_list = ['btc', 'eth']
 
     all_pairs = []
 

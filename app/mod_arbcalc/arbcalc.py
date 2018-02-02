@@ -18,7 +18,47 @@ logging.getLogger('urllib3').setLevel(logging.CRITICAL)
 
 def main():
 
+    # a_price = result[0]['price_usd']
+    price = get_price(currency, exchange)
     get_spread(a, b)
+
+def get_price(curr, exchange):
+
+    # Set configuration and logging up first
+    config_location = "~/.arb-calc"
+    config = load_config(config_location)
+
+    DB_IP = config.get('main', 'DB_IP')
+    DB_USERNAME = config.get('main', 'DB_USERNAME')
+    DB_PASSWORD = config.get('main', 'DB_PASSWORD')
+
+    try:
+        db = pymysql.connect(DB_IP, DB_USERNAME, DB_PASSWORD, cursorclass=pymysql.cursors.DictCursor)
+    except Exception as e:
+        print(e)
+        print("Couldn't connect to DB.")
+        exit()
+
+
+    query = """
+    SELECT id, created, exchange, price_usd 
+    FROM crypto_historical.%s
+    WHERE exchange = '%s'
+    ORDER BY created DESC
+    LIMIT 1
+    """ % (curr, exchange)
+    cursor = db.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
+
+    # sets the price of the cryptocurrency for the particular exchange
+    # scroll up to see loop-defined variables e and c
+    price = result[0]['price_usd']
+
+    db.close()
+
+    return price
+
 
 def get_spread(a, b, curr):
     ''' First, get the price of curr on exchange a.
@@ -80,7 +120,7 @@ def get_spread(a, b, curr):
     # Calculate percentage difference for each pair
     spread = calculate_price_spread(curr, a_price, b_price)
 
-    return spread, a_price, b_price, a + " vs " + b
+    return spread, a_price, b_price
 
 
 def calculate_price_spread(curr, a, b):

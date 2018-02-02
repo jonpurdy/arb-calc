@@ -1,23 +1,210 @@
-<html>
+<!doctype html>
+<html lang="en">
     <head>
-        <title>whatevs</title>
+
+        <meta http-equiv="refresh" content="60">
+        <!-- Required meta tags for Bootstrap-->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Bootstrap-->
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0-beta.2/cyborg/bootstrap.min.css">
+        <title>Arb Calc</title>
+        <!-- jQuery UI-->
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
     </head>
+    
     <body>
-        <h1>{{ user.nickname }}</h1>
-        {% for currency in all_spreads %}
-            <p><table border=1>     
-            <tr><td>{{ currency[0] }}</td><td>Price 1</td><td>Price 2</td><td>Spread %</td></tr>
-            {% for row in currency[1] %}
-                <tr>
-                {% for cell in row %}
-                    <td>{{ cell }}</td>
+
+        <!-- Bootstrap-->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+
+        <!-- Starts Bootstrap container -->
+        <div class="container">
+
+            <!-- Each currency gets its own table -->
+            {% for currency in all_pairs %}
+                <p><table class="table table-bordered ">  
+
+                <!-- First, format the header -->
+                <thead><tr><th>{{ currency[0] }}</th><th>Price 1</th><th>Price 2</th><th>Spread %</th></tr></thead>
+
+                <!-- Next, print each exchange pair -->
+                {% for row in currency[1] %}
+                    <tbody><tr class="{{ currency[0] }}-{{ row[1] }}-{{ row[2] }}">
+
+                    <td>{{ row[0] }}</td>
+
+                    <td><div class="{{ currency[0] }}{{ row[1] }}"></div></td>
+                    <td><div class="{{ currency[0] }}{{ row[2] }}"></div></td>
+                    <!-- div id for spread example: 'korbitquadriga' -->
+                    <td><div class="{{ currency[0] }}-{{ row[1] }}-{{ row[2] }}"></div></td>
+
+                    </tr></tbody>
                 {% endfor %}
-                </tr>
+
+                </table></p>
+  
+
+
             {% endfor %}
-            </table></p>
 
-        {% endfor %}
+            <p>
+              <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Raw data for debugging
+              </a>
+            </p>
+            <div class="collapse" id="collapseExample">
+              <div class="card card-body">
+                {{ all_pairs }}
+                {{ combos_list }}
+              </div>
+            </div>
 
-        <p>Raw data for debugging: {{ all_spreads }}</p>
+
+        <!-- Ends Bootstrap container -->
+        </div>
+
+
+        <script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+        <script type="text/javascript">
+            var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        </script>
+
+        <!-- Below is where we actually grab prices and spreads -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>
+            $( document ).ready(function(){
+
+                console.log( "ready!" );
+
+                // First, get a list of currencies
+                var currencies = [];
+                $.ajax({
+                    url : 'get_currencies',
+                    type: "GET",
+                    dataType : "json",
+                    async: false,
+                    success:  function(data) {
+                        result = data
+                    }
+                });
+                currencies = result
+
+                // Next, get a list of exchanges
+                var exchanges = [];
+                $.ajax({
+                    url : 'get_exchanges',
+                    type: "GET",
+                    dataType : "json",
+                    async: false,
+                    success:  function(data) {
+                        result = data
+                    }
+                });
+                exchanges = result
+
+                // Next, get a list of currency and exchange pairs
+                var currency_and_exchange_pairs = [];
+                $.ajax({
+                    url : 'get_exchange_pairs',
+                    type: "GET",
+                    dataType : "json",
+                    async: false,
+                    success:  function(data) {
+                        result = data
+                    }
+                });
+                exchange_pairs = result
+                console.log( exchange_pairs );
+
+
+                function getPrices(curr, exchange) {
+                    $.ajax({
+                         url : 'get_curr_price_from_exchange',
+                         data: {
+                            currency: curr,
+                            exchange: exchange
+                         },
+                         type: "GET",
+                         dataType : "text",
+                    })
+                    .done(function( text ) {
+                         $( 'div.' + curr + exchange ).html( text );
+                         // id vs class: $( '#' + value ).html( text );
+                         //setTimeout(getPrices(curr, exchange), 10000);
+                    })
+                };
+
+                // Next, loop through each exchange and get the price
+                function getAllPrices() {
+                    $.each(currencies , function (index, curr){
+                        console.log( curr );
+                        $.each(exchanges , function (index, exchange){
+                            console.log( exchange );
+                                getPrices(curr, exchange);     
+
+                        })
+                    })
+
+                    //getAllPrices.done(setInterval(getAllPrices(),10000)); 
+
+                };
+
+                getAllPrices();
+                
+
+
+                // Finally, loop through each exchange pair and get the spread
+                $.each(exchange_pairs , function (index, exch_pair){
+                    console.log( exch_pair );
+                    $.ajax({
+                         url : 'get_spread_now',
+                         data: {
+                            exch_pair: exch_pair,
+                         },
+                         type: "GET",
+                         dataType : "text",
+                    })
+                    .done(function( text ) {
+                        $( 'div.' + exch_pair ).html( text + "%" );
+                        if (text >= 50) {
+                            $( 'tr.' + exch_pair ).css("background-color", "#B20000");  
+                        } else if (text >= 45) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#CC0000"); 
+                        } else if (text >= 40) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#E50000"); 
+                        } else if (text >= 35) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#FF0000"); 
+                        } else if (text >= 30) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#E50166"); 
+                        } else if (text >= 25) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#D80190"); 
+                        } else if (text >= 20) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#CB01B5"); 
+                        } else if (text >= 15) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#AA02BF"); 
+                        } else if (text >= 10) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#7702B2"); 
+                        } else if (text >= 5) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#4B02A5"); 
+                        } else if (text >= 0) { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#240298"); 
+                        } else { 
+                            $( 'tr.' + exch_pair ).css("background-color", "#03038C"); 
+                        } 
+                         // id vs class: $( '#' + value ).html( text );
+                        setTimeout(ajax, 20);
+                    })
+                })
+
+            }); // matches with $( document ).ready(function(){
+
+         </script>
+
+
+
     </body>
 </html>
